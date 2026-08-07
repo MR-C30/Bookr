@@ -150,7 +150,7 @@ alter table public.appointments
   add constraint no_overlapping_appointments
   exclude using gist (
     staff_id with =,
-    tsrange(start_time, end_time) with &&
+    tstzrange(start_time, end_time) with &&
   )
   where (status in ('pending_payment', 'confirmed'));
  
