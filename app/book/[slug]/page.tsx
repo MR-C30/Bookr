@@ -11,7 +11,12 @@ import { Button } from "@/components/ui/button";
 
 interface BookingPageProps {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ date?: string; slot?: string }>;
+  searchParams: Promise<{
+    date?: string;
+    slot?: string;
+    checkout?: string;
+    error?: string;
+  }>;
 }
 
 export default async function BookingPage({
@@ -19,7 +24,12 @@ export default async function BookingPage({
   searchParams,
 }: BookingPageProps) {
   const { slug } = await params;
-  const { date: dateParam, slot: slotParam } = await searchParams;
+  const {
+    date: dateParam,
+    slot: slotParam,
+    checkout,
+    error: errorParam,
+  } = await searchParams;
 
   // tenants has no public RLS select policy yet, so this lookup goes through
   // the service-role client. staff/services below use the anon client since
@@ -121,6 +131,24 @@ export default async function BookingPage({
 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-8">
+      {checkout === "pending" && (
+        <p className="rounded-md bg-green-100 px-4 py-2 text-green-800 dark:bg-green-900 dark:text-green-100">
+          Payment received — we&apos;ll confirm your booking shortly.
+        </p>
+      )}
+
+      {checkout === "cancelled" && (
+        <p className="rounded-md bg-yellow-100 px-4 py-2 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100">
+          Payment was cancelled. Pick a time below to try again.
+        </p>
+      )}
+
+      {errorParam === "slot_taken" && (
+        <p className="rounded-md bg-red-100 px-4 py-2 text-red-800 dark:bg-red-900 dark:text-red-100">
+          That time was just booked by someone else. Please choose another slot.
+        </p>
+      )}
+
       <div className="w-full max-w-md space-y-1 text-center">
         <h1 className="text-2xl font-semibold">{tenant.business_name}</h1>
         <p className="text-muted-foreground">
