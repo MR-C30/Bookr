@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
   const googleError = searchParams.get("error");
   if (googleError) {
     return NextResponse.redirect(
-      new URL(`/?google_error=${encodeURIComponent(googleError)}`, request.url)
+      new URL(`/admin?google_error=${encodeURIComponent(googleError)}`, request.url)
     );
   }
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
   if (!code || !tenantId) {
     return NextResponse.redirect(
-      new URL("/?google_error=missing_code_or_state", request.url)
+      new URL("/admin?google_error=missing_code_or_state", request.url)
     );
   }
 
@@ -37,9 +37,9 @@ export async function GET(request: NextRequest) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "unknown_error";
     return NextResponse.redirect(
-      new URL(`/?google_error=${encodeURIComponent(message)}`, request.url)
+      new URL(`/admin?google_error=${encodeURIComponent(message)}`, request.url)
     );
   }
 
-  return NextResponse.redirect(new URL("/?google_connected=1", request.url));
+  return NextResponse.redirect(new URL("/admin?google_connected=1", request.url));
 }
