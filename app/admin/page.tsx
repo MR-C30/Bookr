@@ -30,7 +30,7 @@ export default async function AdminPage({ searchParams }: AdminPageProps) {
         </p>
       )}
 
-      <Button render={<a href={authUrl}>Connect Google Calendar</a>} />
+      <Button nativeButton={false} render={<a href={authUrl}>Connect Google Calendar</a>} />
     </div>
   );
 }
