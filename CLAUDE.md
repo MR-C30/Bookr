@@ -70,6 +70,7 @@ GOOGLE_CLIENT_SECRET=
 GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/callback/google
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
+SUPABASE_ANON_KEY=
 ```
 
 Payfast sandbox credentials (`payfast_merchant_id`, `payfast_merchant_key`)
