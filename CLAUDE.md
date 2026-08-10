@@ -71,11 +71,14 @@ GOOGLE_REDIRECT_URI=http://localhost:3000/api/auth/callback/google
 SUPABASE_URL=
 SUPABASE_SERVICE_ROLE_KEY=
 SUPABASE_ANON_KEY=
+PAYFAST_MERCHANT_ID=
+PAYFAST_MERCHANT_KEY=
+PAYFAST_PASSPHRASE=
+PAYFAST_URL=https://sandbox.payfast.co.za/eng/process
 ```
 
-Payfast sandbox credentials (`payfast_merchant_id`, `payfast_merchant_key`)
-are needed once the checkout route is built — not required for
-`lib/google-calendar.ts` alone.
+`PAYFAST_MODE` also exists in `.env.local` but is currently unused — see
+Known issues below.
 
 ### Commands
 
@@ -111,6 +114,14 @@ There is no test suite yet.
     it can't resolve to a patched `sharp@0.35.x+` without either an `npm`
     `overrides` entry or an upstream pin bump from Next.js. Re-check
     `npm audit` when upgrading `next`.
+
+- **`PAYFAST_MODE` env var is currently unused.** `.env.local` defines it,
+  but `lib/payfast.ts` reads `PAYFAST_URL` directly and hardcodes nothing
+  else — there's no sandbox/live branching logic. Before going live, this
+  needs a real switch (e.g. `lib/payfast.ts` picking between two known URLs
+  based on `PAYFAST_MODE`, with validation that they can't drift out of
+  sync) so a misconfigured environment can't accidentally hit the wrong
+  Payfast endpoint.
 
 ## Database schema
 
