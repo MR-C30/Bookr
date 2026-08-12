@@ -4,14 +4,15 @@
 
 ---
 
-## Status: 1 of 5 features complete
+## Status: 4 of 5 features built, 1 unverified
 
 ```
-[✅ DONE]  1. Google Calendar OAuth
-[⬜ NEXT]  2. Public booking page (slot picker)
-[⬜ ]      3. Payfast integration
-[⬜ ]      4. Checkout route
-[⬜ ]      5. Webhook (finish line)
+[✅ DONE]        1. Google Calendar OAuth
+[✅ DONE]        2. Public booking page (slot picker)
+[✅ DONE]        3. Payfast integration (signature/payload code written)
+[⚠️ UNVERIFIED]  4. Checkout route (redirects to Payfast, but the sandbox
+                    round-trip has not actually been confirmed — see below)
+[⬜ NEXT]        5. Webhook (finish line)
 ```
 
 ---
@@ -47,6 +48,20 @@
 
 ## Known issues, logged (not blocking, don't forget them)
 
+- **Payfast checkout has not actually been confirmed against the sandbox.**
+  `app/api/checkout/route.ts` has a `TEMPORARY` comment (as of commit
+  `537d573`) stating `lib/payfast.ts`'s signature logic "hasn't been
+  verified against a real Payfast sandbox transaction yet," and only
+  `console.log`s the checkout URL rather than confirming a real redirect
+  succeeded. That commit's message ("tested end to end") overstates this —
+  don't trust it. Treat step 4 as done only once a real browser run
+  reaches the Payfast sandbox payment page with the correct R-amount
+  without a signature-mismatch error, then remove the TEMPORARY comment.
+- **A stray file was accidentally committed in `537d573`** — a 327-line
+  capture of `less --help` output, with a garbled filename derived from
+  the commit message. Removed in a follow-up commit. Worth double-checking
+  `git status`/`git add <specific files>` (not `git add .`) before
+  committing to avoid picking up terminal artifacts like this again.
 - **npm audit**: 3 high-severity advisories (sharp/libvips, nested postcss) — deferred, documented in `CLAUDE.md`. Must revisit before building any feature that renders tenant-uploaded images (`logo_url`, `photo_url`, `image_url`).
 - **Google app is in "Testing" mode** — capped at 100 test users, refresh tokens may expire after 7 days. Fine for demo phase. Will need Google's app verification process before onboarding real host #1 as a live customer — that process takes time, worth starting early once the demo is solid.
 - **Slow filesystem warning** from Next.js/Turbopack — not yet root-caused. Not blocking, but if dev server slowness returns, worth investigating (could be antivirus scanning, could be something else).
@@ -77,8 +92,9 @@ Right now `getAuthUrl()` only gets called via a manual test script. Before build
 **File:** `app/api/checkout/route.ts`
 - Selecting a slot creates a `pending_payment` row in `appointments`
 - Builds the Payfast redirect using `lib/payfast.ts`
+- Code is written, but the redirect itself is unverified — see Known issues.
 
-✅ Done when: clicking a slot on the booking page redirects to a real Payfast sandbox payment page with the correct amount.
+⬜ Done when: clicking a slot on the booking page redirects to a real Payfast sandbox payment page with the correct amount, with no signature-mismatch error.
 
 ### Step 5 — Feature 5: Webhook (the finish line)
 **File:** `app/api/webhooks/payfast/route.ts`
