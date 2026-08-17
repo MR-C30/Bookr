@@ -115,6 +115,15 @@ There is no test suite yet.
     `overrides` entry or an upstream pin bump from Next.js. Re-check
     `npm audit` when upgrading `next`.
 
+- **Google refresh tokens expire after ~7 days while the OAuth app is in
+  Testing mode (unverified).** Once expired, `getAvailableSlots` throws
+  `AuthRequiredError` and the booking page falls back to "Online booking is
+  temporarily unavailable" — if slots stop loading, this is the first thing
+  to check. Fix: reconnect via `/admin`'s "Connect Google Calendar" button to
+  get a fresh token. This will keep recurring until the app goes through
+  Google's OAuth app verification process, which needs to happen before
+  onboarding real clients.
+
 - **`PAYFAST_MODE` env var is currently unused.** `.env.local` defines it,
   but `lib/payfast.ts` reads `PAYFAST_URL` directly and hardcodes nothing
   else — there's no sandbox/live branching logic. Before going live, this
@@ -122,6 +131,16 @@ There is no test suite yet.
   based on `PAYFAST_MODE`, with validation that they can't drift out of
   sync) so a misconfigured environment can't accidentally hit the wrong
   Payfast endpoint.
+
+- **Payfast ITN webhook only verifies the signature, not source IP or the
+  server-to-server "validate" postback.** `app/api/webhooks/payfast/route.ts`
+  checks `generateSignature()` against the incoming ITN before trusting it,
+  but skips the other two checks Payfast's docs recommend: confirming the
+  request came from a Payfast IP, and POSTing the payload back to Payfast's
+  `/eng/query/validate` endpoint for confirmation. Acceptable for now since
+  we're sandbox-only with one tenant, but **must be added before going
+  live** — without them, a signature alone doesn't fully rule out a replayed
+  or forged ITN.
 
 ## Database schema
 
