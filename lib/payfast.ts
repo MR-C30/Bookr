@@ -82,7 +82,11 @@ export function generateSignature(
     pairs.push(`passphrase=${payfastEncode(passphrase)}`);
   }
 
-  return crypto.createHash("md5").update(pairs.join("&")).digest("hex");
+  const rawString = pairs.join("&");
+  // TEMP DEBUG — remove once signature mismatch is resolved.
+  console.log("PAYFAST SIGNATURE RAW STRING:", JSON.stringify(rawString));
+
+  return crypto.createHash("md5").update(rawString).digest("hex");
 }
 
 // ---------------------------------------------------------------------------
