@@ -153,6 +153,16 @@ export async function POST(request: NextRequest) {
   }
 
   const origin = request.nextUrl.origin;
+
+  // notify_url is called server-to-server by Payfast, so it must be a real
+  // publicly-reachable address -- unlike return_url/cancel_url (just browser
+  // redirects), request.nextUrl.origin isn't reliable for this if we're ever
+  // behind a tunnel/proxy in dev, so it comes from its own env var instead.
+  const publicBaseUrl = process.env.PUBLIC_BASE_URL;
+  if (!publicBaseUrl) {
+    throw new Error("Missing required env var: PUBLIC_BASE_URL");
+  }
+
   const checkoutUrl = buildCheckoutUrl({
     m_payment_id: appointment.id,
     amount: depositAmount,
@@ -160,7 +170,7 @@ export async function POST(request: NextRequest) {
     name_first: fullName,
     return_url: `${origin}/book/${tenant.slug}?checkout=pending`,
     cancel_url: `${origin}/book/${tenant.slug}?checkout=cancelled`,
-    notify_url: `${origin}/api/webhooks/payfast`,
+    notify_url: `${publicBaseUrl}/api/webhooks/payfast`,
   });
 
   // TEMPORARY: lib/payfast.ts's signature logic hasn't been verified

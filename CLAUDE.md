@@ -75,6 +75,7 @@ PAYFAST_MERCHANT_ID=
 PAYFAST_MERCHANT_KEY=
 PAYFAST_PASSPHRASE=
 PAYFAST_URL=https://sandbox.payfast.co.za/eng/process
+PUBLIC_BASE_URL=http://localhost:3000
 ```
 
 `PAYFAST_MODE` also exists in `.env.local` but is currently unused — see
